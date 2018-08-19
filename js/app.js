@@ -13,7 +13,6 @@ let time = 0;
 let clockOff = true;
 let clockId, flickerId, gameTime;
 let shuffledCards = [];
-let flippedCardInDeck;
 let matchedPairs = 0;
 const cardsMaxLength = 2;
 const minMovesToWin = 7;
@@ -38,10 +37,6 @@ let shuffleDeck = function(){
     let cardArray = Array.from(cardsToShuffle);
     shuffledCards = shuffle(cardArray);
     for (let card of shuffledCards){
-        if (card.classList.contains("show")){
-            card.classList.add("flipped");
-        }
-
         if(card.classList.contains("match")){
             card.classList.add("initMatched");
         }
@@ -149,16 +144,6 @@ const showCard = function(card){
 }
 
 
-const checkForAlreadyFlippedCards = function(){
-    for (let card of shuffledCards){
-        if(card.classList.contains("flipped")){
-            flippedCardInDeck = card;
-            return cards.indexOf(card);
-        }
-    }
-    return false;
-}
-
 const checkForGameCompletion = function(){
     if(matchedPairs == minMovesToWin ){
         matchedPairs = 0;
@@ -175,12 +160,8 @@ const toggleGameStatsPopUp = function(){
 
 const resetCards = function(){
     for (let card of shuffledCards){
-        if(!(card.classList.contains("flipped")) && !(card.classList.contains("initMatched"))){
+        if(!(card.classList.contains("initMatched"))){
             card.className = "card";
-        }
-
-        if(card.classList.contains("flipped")){
-            card.classList.remove("match");
         }
     }
 }
@@ -240,7 +221,7 @@ deck.addEventListener('click', (event) =>{
     let isElementCardType = card.classList.contains("card");
     let isMatchedCard = card.classList.contains("match");
     let isCardAlreadyAddedToCardArray = cards.includes(card);
-    if(isElementCardType && !isMatchedCard && !isCardAlreadyAddedToCardArray && !card.classList.contains("flipped") && cards.length < cardsMaxLength){
+    if(isElementCardType && !isMatchedCard && !isCardAlreadyAddedToCardArray && cards.length < cardsMaxLength){
         if(clockOff){
             startTimer();
             clockOff = false;
@@ -253,16 +234,6 @@ deck.addEventListener('click', (event) =>{
 
     const checkCards = function(){
         let cardsLength = cards.length;
-        checkForAlreadyFlippedCards();
-        if(cardsLength == 1 && cards[0].firstElementChild.className === flippedCardInDeck.firstElementChild.className){
-             cards[0].classList.toggle("match");
-             flippedCardInDeck.classList.toggle("match");
-             addMoves();
-             calculateStarRating();
-             matchedPairs++;
-             checkForGameCompletion();
-             cards = [];
-        }
         if(cardsLength == cardsMaxLength){
             addMoves();
             calculateStarRating();
@@ -278,21 +249,9 @@ deck.addEventListener('click', (event) =>{
                 setTimeout(() => {
                     let firstCard = cards[0];
                     let secondCard = cards[1];
-                    if (checkForAlreadyFlippedCards() >=0){
-                        if(checkForAlreadyFlippedCards() == 0){
-                            showCard(secondCard);
-                        }
-                        else if (checkForAlreadyFlippedCards() == 1){
-                            showCard(firstCard);
-                        }
-                        cards = [];
-                    }
-                    else{
                         showCard(firstCard);
                         showCard(secondCard);
                         cards = [];
-                    }
-
                 },1000);
 
             }
